@@ -27,6 +27,7 @@
 #include "poll_utils.h"
 #include "tcp/tcp.h"
 #include "verbs.h"
+#include "network/utils.h"
 
 using std::cout;
 using std::endl;
@@ -51,8 +52,8 @@ namespace sst {
 const char *dev_name = NULL;
 /** Local IB port to work with. */
 int ib_port = 1;
-/** GID index to use. */
-int gid_idx = 0;
+/** GID index to use. Imported from networks/utils. */
+int gid_idx = gid;
 
 tcp::tcp_connections *sst_connections;
 
@@ -482,7 +483,7 @@ void resources_create() {
         cout << "NO RDMA device present" << endl;
     }
     // search for the specific device we want to work with
-    for(i = 1; i < num_devices; i++) {
+    for(i = network_device; i < num_devices; i++) {
         if(!dev_name) {
             dev_name = strdup(ibv_get_device_name(dev_list[i]));
             fprintf(stdout, "device not specified, using first one found: %s\n",
