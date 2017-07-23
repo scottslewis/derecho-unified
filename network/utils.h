@@ -8,7 +8,7 @@
  */
 
 int network_device = 0; // sets network interface. set to 0 for SoftRoCE
-int gid = 1;      // needs to be non-zero for SoftRoCE
+int default_gid = 1;      // needs to be non-zero for SoftRoCE
 
 
 

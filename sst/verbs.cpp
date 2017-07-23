@@ -53,7 +53,7 @@ const char *dev_name = NULL;
 /** Local IB port to work with. */
 int ib_port = 1;
 /** GID index to use. Imported from networks/utils. */
-int gid_idx = gid;
+int gid_idx = default_gid;
 
 tcp::tcp_connections *sst_connections;
 

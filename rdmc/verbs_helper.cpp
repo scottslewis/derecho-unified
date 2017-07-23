@@ -606,7 +606,7 @@ queue_pair::queue_pair(size_t remote_index,
             return;
         }
     } else {
-        memset(&my_gid, 0, sizeof my_gid);
+        memset(&my_gid, default_gid, sizeof my_gid);
     }
 
     /* exchange using TCP sockets info required to connect QPs */
