@@ -15,6 +15,9 @@ add_custom_target(
 	COMMAND make
 	WORKING_DIRECTORY ${derecho_SOURCE_DIR}/third_party/mutils
 )
+include_directories(${derecho_SOURCE_DIR}/../rdma-core/build/include)
+link_directories(${derecho_SOURCE_DIR}/../rdma-core/build/lib)
+
 include_directories(${derecho_SOURCE_DIR}/third_party/mutils)
 link_directories(${derecho_SOURCE_DIR}/third_party/mutils)
 add_custom_target(

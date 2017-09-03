@@ -7,7 +7,7 @@
  * including global setup variables.
  */
 
-int network_device = 0; // sets network interface. set to 0 for SoftRoCE
+int network_device = 1; // sets network interface. set to 0 for SoftRoCE
 int default_gid = 1;      // needs to be non-zero for SoftRoCE
 
 

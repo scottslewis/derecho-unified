@@ -6,6 +6,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "-std=c++14 -Wall -ggdb -gdwarf-3")
 set(CMAKE_CXX_FLAGS_RELEASE "-std=c++14 -Wall -O3")
 
 include_directories(${derecho_SOURCE_DIR})
+include_directories(${derecho_SOURCE_DIR}/rdma-core/build/lib)
+include_directories(${derecho_SOURCE_DIR}/../rdma-core/build/include)
+link_directories(${derecho_SOURCE_DIR}/../rdma-core/build/lib)
 
 ADD_LIBRARY(rdmc SHARED rdmc.cpp util.cpp group_send.cpp verbs_helper.cpp schedule.cpp)
 TARGET_LINK_LIBRARIES(rdmc tcp rdmacm ibverbs rt pthread)

@@ -199,33 +199,51 @@ void resources::set_qp_ready_to_receive() {
     memset(&attr, 0, sizeof(attr));
     // change the state to ready to receive
     attr.qp_state = IBV_QPS_RTR;
+    cout << "state: " << attr.qp_state << endl;
     attr.path_mtu = IBV_MTU_256;
+    cout << "mtu: " << attr.path_mtu << endl;
+    
     // set the queue pair number of the remote side
     attr.dest_qp_num = remote_props.qp_num;
+    cout << "dest_qp_num: " << attr.dest_qp_num << endl;
     attr.rq_psn = 0;
+    cout << "rq_psn: " << attr.rq_psn << endl;
     attr.max_dest_rd_atomic = 1;
+   
     attr.min_rnr_timer = 0x12;
+    cout << "min_rnr_timer: " << attr.min_rnr_timer << endl;
     attr.ah_attr.is_global = 0;
     // set the local id of the remote side
     attr.ah_attr.dlid = remote_props.lid;
+    cout << "ah_attr.dlid: " << attr.ah_attr.dlid << endl;
     attr.ah_attr.sl = 0;
+    
     attr.ah_attr.src_path_bits = 0;
     // the infiniband port to associate with
     attr.ah_attr.port_num = ib_port;
+    cout << "port_num: " << ib_port << endl;
     if(gid_idx >= 0) {
         attr.ah_attr.is_global = 1;
+        cout << "gid_idx (and sgid_index: " << gid_idx << endl;
+        attr.ah_attr.grh.sgid_index = gid_idx;
+        attr.ah_attr.grh.hop_limit = 10;
+        cout << "hop limit: 10" << endl;
+        attr.ah_attr.grh.flow_label = 0;
+        cout << "flow_label: 0" << endl;
         attr.ah_attr.port_num = 1;
         memcpy(&attr.ah_attr.grh.dgid, remote_props.gid, 16);
-        attr.ah_attr.grh.flow_label = 0;
-        attr.ah_attr.grh.hop_limit = 1;
-        attr.ah_attr.grh.sgid_index = gid_idx;
+        cout << "attr.ah_attr.grh.dgid.global.interface_id: " <<  attr.ah_attr.grh.dgid.global.interface_id << endl;
+        cout << "attr.ah_attr.grh.dgid.global.subnet_prefix: " <<  attr.ah_attr.grh.dgid.global.subnet_prefix << endl;
+//        attr.ah_attr.grh.hop_limit = 1;
         attr.ah_attr.grh.traffic_class = 0;
+
     }
     flags = IBV_QP_STATE | IBV_QP_AV | IBV_QP_PATH_MTU | IBV_QP_DEST_QPN | IBV_QP_RQ_PSN | IBV_QP_MAX_DEST_RD_ATOMIC | IBV_QP_MIN_RNR_TIMER;
     rc = ibv_modify_qp(qp, &attr, flags);
     if(rc) {
         cout << "Failed to modify queue pair to ready-to-receive state, error code is " << rc << endl;
     }
+    else { cout << "Successfully changed queue pair state to ready-to-receive" << endl; }
 }
 
 void resources::set_qp_ready_to_send() {

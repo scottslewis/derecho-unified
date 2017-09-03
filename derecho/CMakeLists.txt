@@ -11,7 +11,9 @@ include_directories(${derecho_SOURCE_DIR}/third_party)
 include_directories(${derecho_SOURCE_DIR}/third_party/mutils)
 include_directories(${derecho_SOURCE_DIR}/third_party/mutils-serialization)
 include_directories(${derecho_SOURCE_DIR}/third_party/spdlog/include)
+include_directories(${derecho_SOURCE_DIR}/../rdma-core/build/include)
 
+link_directories(${derecho_SOURCE_DIR}/../rdma-core/build/lib)
 link_directories(${derecho_SOURCE_DIR}/third_party/mutils)
 link_directories(${derecho_SOURCE_DIR}/third_party/mutils-serialization)
 

@@ -202,7 +202,7 @@ static int modify_qp_to_rtr(struct ibv_qp *qp, uint32_t remote_qpn,
     attr.ah_attr.port_num = ib_port;
     if(gid_idx >= 0) {
         attr.ah_attr.is_global = 1;
-        attr.ah_attr.port_num = 1;
+        attr.ah_attr.port_num = ib_port;
         memcpy(&attr.ah_attr.grh.dgid, dgid, 16);
         attr.ah_attr.grh.flow_label = 0;
         attr.ah_attr.grh.hop_limit = 0xFF;
