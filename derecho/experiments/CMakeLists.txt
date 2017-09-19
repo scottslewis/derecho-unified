@@ -34,6 +34,10 @@ target_link_libraries(multiple_senders_multiple_messages derecho)
 add_executable(derecho_bw_test derecho_bw_test.cpp block_size.cpp aggregate_bandwidth.cpp initialize.cpp )
 target_link_libraries(derecho_bw_test derecho)
 
+# rdmc_bw_test
+add_executable(rdmc_bw_test rdmc_bw_test.cpp block_size.cpp aggregate_bandwidth.cpp initialize.cpp )
+target_link_libraries(rdmc_bw_test derecho)
+
 # latency_test
 add_executable(latency_test latency_test.cpp block_size.cpp)
 target_link_libraries(latency_test derecho)
@@ -89,6 +93,9 @@ target_link_libraries(log_recovery_crash derecho)
 
 add_executable(local_filewriter_test local_filewriter_test.cpp)
 target_link_libraries(local_filewriter_test derecho)
+
+add_executable(derecho_sst_test derecho_sst_test.cpp)
+target_link_libraries(derecho_sst_test derecho)
 
 # typed_subgroup_test
 add_executable(typed_subgroup_test typed_subgroup_test.cpp initialize.cpp)

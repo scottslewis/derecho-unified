@@ -79,8 +79,8 @@ int main(int argc, char *argv[]) {
             num_senders_selector,
             num_last_received = 0u
         ](uint32_t subgroup, int sender_id, long long int index, char *buf, long long int msg_size) mutable {
-            // cout << "In stability callback; sender = " << sender_id
-            // << ", index = " << index << endl;
+	  // cout << "In stability callback; sender = " << sender_id
+	  // << ", index = " << index << endl;
             if(num_senders_selector == 0) {
                 if(index == num_messages - 1 && sender_id == (int)num_nodes - 1) {
                     done = true;
@@ -151,6 +151,9 @@ int main(int argc, char *argv[]) {
 
         while(managed_group->get_members().size() < num_nodes) {
         }
+	// while(true) {
+
+	// }
 	uint32_t node_rank = -1;
         auto members_order = managed_group->get_members();
         cout << "The order of members is :" << endl;
@@ -165,7 +168,7 @@ int main(int argc, char *argv[]) {
         auto send_all = [&]() {
             RawSubgroup &group_as_subgroup = managed_group->get_subgroup<RawObject>();
             for(int i = 0; i < num_messages; ++i) {
-                // cout << "Asking for a buffer" << endl;
+	      // cout << "Asking for a buffer" << endl;
                 char *buf = group_as_subgroup.get_sendbuffer_ptr(max_msg_size, send_medium);
                 while(!buf) {
                     buf = group_as_subgroup.get_sendbuffer_ptr(max_msg_size, send_medium);

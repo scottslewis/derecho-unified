@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "../sst.h"
 #include "../verbs.h"
 
@@ -9,10 +11,11 @@ using std::map;
 
 class mySST : public sst::SST<mySST> {
 public:
-    mySST(const vector<uint32_t>& _members, uint32_t my_id) : SST(this, sst::SSTParams{_members, my_id}) {
-        SSTInit(a);
+  mySST(const vector<uint32_t>& _members, uint32_t my_id, uint32_t size) : SST(this, sst::SSTParams{_members, my_id}),
+							    c(size) {
+        SSTInit(c);
     }
-    sst::SSTField<int> a;
+    sst::SSTFieldVector<char> c;
 };
 
 int main() {
@@ -34,16 +37,21 @@ int main() {
         members[i] = i;
     }
 
-    mySST sst(members, my_id);
-    int b = 5 + my_id;
-    sst.a(my_id, b);
-    sst.put();
+    mySST sst(members, my_id, 1411);
+    // int b = 5 + my_id;
+    // sst.a[my_id][0] = b;
+    if (my_id == 1) {
+      sst.put_with_completion();
+    }
     sst::sync(1 - my_id);
-    int n;
-    cin >> n;
-    for(uint i = 0; i < num_nodes; ++i) {
-        cout << sst.a(i) << endl;
-    }
-    while(true) {
-    }
+    // while (true) {
+    // int n;
+    // cin >> n;
+    // sst.a[my_id][0] = n;
+    // sst.put_with_completion();
+    // for(uint i = 0; i < num_nodes; ++i) {
+    //   cout << sst.a[i][0] << endl;
+    // }
+    // }
+    std::this_thread::sleep_for(std::chrono::seconds(1));
 }

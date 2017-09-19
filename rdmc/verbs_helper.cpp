@@ -194,7 +194,7 @@ static int modify_qp_to_rtr(struct ibv_qp *qp, uint32_t remote_qpn,
     attr.dest_qp_num = remote_qpn;
     attr.rq_psn = 0;
     attr.max_dest_rd_atomic = 1;
-    attr.min_rnr_timer = 16;
+    attr.min_rnr_timer = 0x12;
     attr.ah_attr.is_global = 1;
     attr.ah_attr.dlid = dlid;
     attr.ah_attr.sl = 0;
@@ -204,6 +204,10 @@ static int modify_qp_to_rtr(struct ibv_qp *qp, uint32_t remote_qpn,
         attr.ah_attr.is_global = 1;
         attr.ah_attr.port_num = ib_port;
         memcpy(&attr.ah_attr.grh.dgid, dgid, 16);
+        cout << "[RDMC] subnet prefix found by code: " << attr.ah_attr.grh.dgid.global.subnet_prefix << endl;
+        cout << "[RDMC] attr.ah_attr.grh.dgid.global.interface_id: " <<  attr.ah_attr.grh.dgid.global.interface_id << endl;
+        attr.ah_attr.grh.dgid.global.subnet_prefix = 33022;
+        cout << "set subnet prefix to 33022" << endl;
         attr.ah_attr.grh.flow_label = 0;
         attr.ah_attr.grh.hop_limit = 0xFF;
         attr.ah_attr.grh.sgid_index = gid_idx;
@@ -221,7 +225,7 @@ static int modify_qp_to_rts(struct ibv_qp *qp) {
     int rc;
     memset(&attr, 0, sizeof(attr));
     attr.qp_state = IBV_QPS_RTS;
-    attr.timeout = 4;
+    attr.timeout = 0;
     attr.retry_cnt = 6;
     attr.rnr_retry = 6;
     attr.sq_psn = 0;
@@ -607,12 +611,13 @@ queue_pair::queue_pair(size_t remote_index,
         }
     } else {
         memset(&my_gid, default_gid, sizeof my_gid);
+	cout << "subnet prefix of the local gid is: " << my_gid.global.subnet_prefix << endl;
     }
 
     /* exchange using TCP sockets info required to connect QPs */
     local_con_data.qp_num = qp->qp_num;
     local_con_data.lid = verbs_resources.port_attr.lid;
-    memcpy(local_con_data.gid, &my_gid, 16);
+    memcpy(local_con_data.gid, &my_gid, sizeof(my_gid));
     // fprintf(stdout, "Local QP number  = 0x%x\n", qp->qp_num);
     // fprintf(stdout, "Local LID        = 0x%x\n",
     // verbs_resources.port_attr.lid);

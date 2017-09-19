@@ -200,7 +200,7 @@ void resources::set_qp_ready_to_receive() {
     // change the state to ready to receive
     attr.qp_state = IBV_QPS_RTR;
     cout << "state: " << attr.qp_state << endl;
-    attr.path_mtu = IBV_MTU_256;
+    attr.path_mtu = IBV_MTU_4096;
     cout << "mtu: " << attr.path_mtu << endl;
     
     // set the queue pair number of the remote side
@@ -210,7 +210,7 @@ void resources::set_qp_ready_to_receive() {
     cout << "rq_psn: " << attr.rq_psn << endl;
     attr.max_dest_rd_atomic = 1;
    
-    attr.min_rnr_timer = 0x12;
+    attr.min_rnr_timer = 0;
     cout << "min_rnr_timer: " << attr.min_rnr_timer << endl;
     attr.ah_attr.is_global = 0;
     // set the local id of the remote side
@@ -224,16 +224,17 @@ void resources::set_qp_ready_to_receive() {
     cout << "port_num: " << ib_port << endl;
     if(gid_idx >= 0) {
         attr.ah_attr.is_global = 1;
-        cout << "gid_idx (and sgid_index: " << gid_idx << endl;
+        cout << "gid_idx (and sgid_index): " << gid_idx << endl;
         attr.ah_attr.grh.sgid_index = gid_idx;
         attr.ah_attr.grh.hop_limit = 10;
         cout << "hop limit: 10" << endl;
         attr.ah_attr.grh.flow_label = 0;
         cout << "flow_label: 0" << endl;
-        attr.ah_attr.port_num = 1;
+        attr.ah_attr.port_num = ib_port;
         memcpy(&attr.ah_attr.grh.dgid, remote_props.gid, 16);
-        cout << "attr.ah_attr.grh.dgid.global.interface_id: " <<  attr.ah_attr.grh.dgid.global.interface_id << endl;
-        cout << "attr.ah_attr.grh.dgid.global.subnet_prefix: " <<  attr.ah_attr.grh.dgid.global.subnet_prefix << endl;
+        cout << "[SST] attr.ah_attr.grh.dgid.global.interface_id: " <<  attr.ah_attr.grh.dgid.global.interface_id << endl;
+        //attr.ah_attr.grh.dgid.global.subnet_prefix = 33022;
+        cout << "[SST] attr.ah_attr.grh.dgid.global.subnet_prefix: " <<  attr.ah_attr.grh.dgid.global.subnet_prefix << endl;
 //        attr.ah_attr.grh.hop_limit = 1;
         attr.ah_attr.grh.traffic_class = 0;
 
@@ -252,9 +253,9 @@ void resources::set_qp_ready_to_send() {
     memset(&attr, 0, sizeof(attr));
     // set the state to ready to send
     attr.qp_state = IBV_QPS_RTS;
-    attr.timeout = 4;  // The timeout is 4.096x2^(timeout) microseconds
+    attr.timeout = 14;  // The timeout is 4.096x2^(timeout) microseconds
     attr.retry_cnt = 6;
-    attr.rnr_retry = 0;
+    attr.rnr_retry = 6;
     attr.sq_psn = 0;
     attr.max_rd_atomic = 1;
     flags = IBV_QP_STATE | IBV_QP_TIMEOUT | IBV_QP_RETRY_CNT | IBV_QP_RNR_RETRY | IBV_QP_SQ_PSN | IBV_QP_MAX_QP_RD_ATOMIC;
@@ -284,6 +285,7 @@ void resources::connect_qp() {
         }
     } else {
         memset(&my_gid, 0, sizeof my_gid);
+        
     }
 
     // exchange using TCP sockets info required to connect QPs
@@ -291,7 +293,7 @@ void resources::connect_qp() {
     local_con_data.rkey = htonl(write_mr->rkey);
     local_con_data.qp_num = htonl(qp->qp_num);
     local_con_data.lid = htons(g_res->port_attr.lid);
-    memcpy(local_con_data.gid, &my_gid, 16);
+    memcpy(local_con_data.gid, &my_gid, sizeof my_gid);
     bool success = sst_connections->exchange(remote_index, local_con_data, tmp_con_data);
     if(!success) {
         cout << "Could not exchange qp data in connect_qp" << endl;
@@ -300,7 +302,7 @@ void resources::connect_qp() {
     remote_con_data.rkey = ntohl(tmp_con_data.rkey);
     remote_con_data.qp_num = ntohl(tmp_con_data.qp_num);
     remote_con_data.lid = ntohs(tmp_con_data.lid);
-    memcpy(remote_con_data.gid, tmp_con_data.gid, 16);
+    memcpy(remote_con_data.gid, tmp_con_data.gid, sizeof tmp_con_data.gid);
     // save the remote side attributes, we will need it for the post SR
     remote_props = remote_con_data;
 
@@ -500,18 +502,22 @@ void resources_create() {
     if(!num_devices) {
         cout << "NO RDMA device present" << endl;
     }
+    cout << "Number of devices are: " << num_devices << endl;
     // search for the specific device we want to work with
     for(i = network_device; i < num_devices; i++) {
-        if(!dev_name) {
-            dev_name = strdup(ibv_get_device_name(dev_list[i]));
+      if(!dev_name) {
+	  dev_name = strdup(ibv_get_device_name(dev_list[i]));
+	  // cout << dev_name << endl;
             fprintf(stdout, "device not specified, using first one found: %s\n",
                     dev_name);
         }
         if(!strcmp(ibv_get_device_name(dev_list[i]), dev_name)) {
             ib_dev = dev_list[i];
-            break;
+	    // cout << "Device chosen: " << dev_name << endl;
+            // break;
         }
     }
+    // exit(0);
     // if the device wasn't found in host
     if(!ib_dev) {
         cout << "No RDMA devices found in the host" << endl;
@@ -527,6 +533,7 @@ void resources_create() {
     ib_dev = NULL;
     // query port properties
     rc = ibv_query_port(g_res->ib_ctx, ib_port, &g_res->port_attr);
+    cout << "Maximum message size: " << g_res->port_attr.max_msg_sz << endl;
     if(rc) {
         cout << "Could not query port properties, error code is " << rc << endl;
     }

@@ -1053,10 +1053,14 @@ void MulticastGroup::send_loop() {
 
 void MulticastGroup::check_failures_loop() {
     pthread_setname_np(pthread_self(), "timeout_thread");
+    static int cnt = 0;
     while(!thread_shutdown) {
         std::this_thread::sleep_for(std::chrono::milliseconds(sender_timeout));
         if(sst) {
             sst->put_with_completion((char*)std::addressof(sst->heartbeat[0]) - sst->getBaseAddress(), sizeof(bool));
+	    cnt++;
+	    // std::cout << (char*)std::addressof(sst->heartbeat[0]) - sst->getBaseAddress() << std::endl;
+	    // std::cout << cnt << std::endl;
         }
     }
 
