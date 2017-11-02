@@ -37,12 +37,12 @@ int main() {
         members[i] = i;
     }
 
-    mySST sst(members, my_id, 1411);
+    int size;
+    cin >> size;
+    mySST sst(members, my_id, size);
     // int b = 5 + my_id;
     // sst.a[my_id][0] = b;
-    if (my_id == 1) {
-      sst.put_with_completion();
-    }
+    sst.put_with_completion();
     sst::sync(1 - my_id);
     // while (true) {
     // int n;

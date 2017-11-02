@@ -153,8 +153,15 @@ void SST<DerivedSST>::put(const std::vector<uint32_t> receiver_ranks, long long 
         if(index == my_index || row_is_frozen[index]) {
             continue;
         }
-        // perform a remote RDMA write on the owner of the row
-        res_vec[index]->post_remote_write(0, offset, size);
+	// softRoCE plug - LOL
+	// break the possibly large row into chunks of 1K
+	int chunk_size = 1000;
+	long long int relative_put_offset = 0;
+	for (; relative_put_offset + chunk_size < size; relative_put_offset += chunk_size) {
+	  // perform a remote RDMA write on the owner of the row
+	  res_vec[index]->post_remote_write(0, offset + relative_put_offset, chunk_size);
+	}
+	res_vec[index]->post_remote_write(0, offset + relative_put_offset, size - relative_put_offset);
     }
     return;
 }
@@ -178,8 +185,18 @@ void SST<DerivedSST>::put_with_completion(const std::vector<uint32_t> receiver_r
         if(index == my_index || row_is_frozen[index]) {
             continue;
         }
-        // perform a remote RDMA write on the owner of the row
-        res_vec[index]->post_remote_write_with_completion(id, offset, size);
+	// same thing here
+	// break the possibly large row into chunks of 1K
+	int chunk_size = 1000;
+	long long int relative_put_offset = 0;
+	for (; relative_put_offset + chunk_size < size; relative_put_offset += chunk_size) {
+	  // perform a remote RDMA write on the owner of the row
+	  // only the last remote write (outside the loop) will generate a completion
+	  // this avoids unnecessary completions
+	  res_vec[index]->post_remote_write(0, offset + relative_put_offset, chunk_size);
+	}
+	// WITH_COMPLETION! - with the id
+	res_vec[index]->post_remote_write_with_completion(id, offset + relative_put_offset, size - relative_put_offset);
         posted_write_to[index] = true;
         num_writes_posted++;
     }
