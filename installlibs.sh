@@ -11,7 +11,3 @@ sudo apt-get -y install libibverbs-dev
 sudo apt-get -y install libboost-dev
 # libboost-system-dev
 sudo apt-get -y install libboost-system-dev
-
-# CMake
-sudo apt-get -y install cmake
-

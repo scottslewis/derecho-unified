@@ -12,8 +12,10 @@ request = pc.makeRequestRSpec()
 # Add a raw PC to the request.
 node = request.RawPC("node")
 
-# Install and execute a script that is contained in the repository.
+# Install and execute installlibs.sh
 node.addService(pg.Execute(shell="sh", command="/local/repository/installibs.sh"))
+# Install and execute installlibs.sh
+node.addService(pg.Execute(shell="sh", command="/local/repository/instaltools.sh"))
 
 # Print the RSpec to the enclosing page.
 pc.printRequestRSpec(request)
