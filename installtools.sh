@@ -12,7 +12,7 @@ sudo apt-get -y install swig
 
 cd ~
 
-git clone --recursive https://github.com/Derecho-Project/derecho-unified.git
+git clone --recursive https://github.com/scottslewis/derecho-unified
 
 mkdir Release
 cd Release
