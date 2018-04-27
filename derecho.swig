@@ -9,11 +9,4 @@
  
  %template(RawGroup) derecho::Group<>
 
- extern derecho::DerechoParams
- extern derecho::SubgroupInfo
- extern RawGroup
- extern derecho::RawSubgroup
- extern derecho::RawObject
- 
- 
  
