@@ -14,6 +14,7 @@ cd ~
 
 git clone --recursive https://github.com/scottslewis/derecho-unified
 
+cd derecho-unified
 mkdir Release
 cd Release
 cmake -DCMAKE_BUILD_TYPE=Release ..
